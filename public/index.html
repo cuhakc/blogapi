@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Blog API</title>
+    <!-- Import Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+    <!-- Link to external CSS file -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <div class="container">
+        <h1>Assignment 3</h1>
+        <div class="card">
+            <h2 id="form-title" style="margin-bottom: 1.5rem;">Create New Post</h2>
+            <input type="hidden" id="post-id">
+            
+            <div class="form-group">
+                <label>Title</label>
+                <input type="text" id="title" placeholder="some newsworthy title">
+            </div>
+            
+            <div class="form-group">
+                <label>Author</label>
+                <input type="text" id="author" placeholder="who wrote this?">
+            </div>
+            
+            <div class="form-group">
+                <label>Content</label>
+                <textarea id="body" rows="5" placeholder="write a story!"></textarea>
+            </div>
+            
+            <button onclick="savePost()" id="save-btn">Publish Post</button>
+            <button onclick="resetForm()" id="cancel-btn" style="display: none;">Cancel Edit</button>
+        </div>
+        <h2 class="section-title">Latest Stories</h2>
+        <div id="blog-list">
+        </div>
+    </div>
+    <script src="app.js"></script> 
+    <script>
+        const originalFetchPosts = fetchPosts;
+        fetchPosts = async function() {
+            const response = await fetch(API_URL);
+            const blogs = await response.json();
+            const list = document.getElementById('blog-list');
+            list.innerHTML = '';
+            blogs.forEach(blog => {
+                const postDiv = document.createElement('div');
+                postDiv.className = 'blog-post';
+                postDiv.innerHTML = `
+                    <div class="blog-header">
+                        <h3>${blog.title}</h3>
+                    </div>
+                    <small class="blog-meta">By <strong>${blog.author}</strong> • ${new Date(blog.createdAt).toLocaleDateString()}</small>
+                    <p class="blog-body">${blog.body}</p>
+                    <div class="actions">
+                        <button class="btn-sm edit" onclick="editPost('${blog._id}', '${escape(blog.title)}', '${escape(blog.author)}', '${escape(blog.body)}')">Edit</button>
+                        <button class="btn-sm delete" onclick="deletePost('${blog._id}')">Delete</button>
+                    </div>
+                `;
+                list.appendChild(postDiv);
+            });
+        }
+        fetchPosts();
+    </script>
+</body>
+</html>
